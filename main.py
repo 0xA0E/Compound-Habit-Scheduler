@@ -6,37 +6,38 @@ def get_date(jump):
     considered_day = (date.today() + timedelta(days=jump)).strftime("%a %d %b")
     return considered_day
     
-def make_Schedule(start, end, increase):
-    days_list = []
-    current = start
-    prev = current
+def generate_schedule(start, end, increase):
+    current_time_spent = start
+    prev_time_spent = current_time_spent
     current_day = 1
-    while current < end:
-        hours, minutes = divmod(current, 60) 
-        hours = int(hours)
-        minutes = int(minutes)
-        jump = int(current- prev)
+    while current_time_spent < end:
+        hours, minutes = (int(x) for x in divmod(current_time_spent, 60))
+        added = int(current_time_spent - prev_time_spent)
         date = get_date(current_day)
-        days_list += [[f'Day {current_day} ', f'{date}: ', f'{hours}H {minutes}MIN', f'Added {jump}MIN']]
-        prev = current
-        current += current*increase
+        day = [f'(Day {current_day}) ', f'{date}: ', f'{hours}H {minutes}MIN', f'Added {added}MIN']
+        prev_time_spent = current_time_spent
+        current_time_spent *= (1 + increase)
         current_day += 1
-    return days_list
+        yield day
 
-def print_Schedule(schedule):
-    for i in range(len(schedule)):
-        if(i % 7 == 0):
-            week = int(i/7) + 1;
-            print(f'WEEK {week}')
-        print("{: <10} {: <10} {: <10} {: <10}".format(*schedule[i]))
-        if(i % 7 == 6):
-            print()
+def print_day(day):
+        print("{: <10}  {: <15}  {: <15}  {: <15}".format(*day))
 
-def main():
+if __name__ == '__main__':
     current_time_spent = int(input("Enter the amount of time you currently spend on this habit (or want to start spending) (in min): "))
-    compound_percent = float(input("Enter a daily interest for your habits: "))
+    compound_percent = float(input("Enter a daily interest for your habits (between 0-1): "))
     goal = int(input("What's your end goal for this habit (in min): "))
-    schedule = make_Schedule(current_time_spent, goal, compound_percent)
-    print_Schedule(schedule)
-    
-main()
+    schedule = generate_schedule(current_time_spent, goal, compound_percent)
+    print('\n\n\n')
+    for day in schedule:
+        print_day(day)
+        if(day[1][0:3] == 'Sun'):
+            break
+    day_counter = 0
+    for day in schedule:
+        if day_counter % 7 == 0:
+            print(f'WEEK {int(day_counter/7)}')
+        print_day(day)
+        if day_counter % 7 == 6:
+            print()
+        day_counter += 1
