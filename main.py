@@ -9,12 +9,12 @@ def get_date(jump):
 def generate_schedule(start, end, increase):
     current_time_spent = start
     prev_time_spent = current_time_spent
-    current_day = 1
+    current_day = 0
     while current_time_spent < end:
         hours, minutes = (int(x) for x in divmod(current_time_spent, 60))
         added = int(current_time_spent - prev_time_spent)
         date = get_date(current_day)
-        day = [f'(Day {current_day}) ', f'{date}: ', f'{hours}H {minutes}MIN', f'Added {added}MIN']
+        day = (f'(Day {current_day}) ', f'{date}: ', f'{hours}H {minutes}MIN', f'Added {added}MIN')
         prev_time_spent = current_time_spent
         current_time_spent *= (1 + increase)
         current_day += 1
@@ -29,15 +29,16 @@ if __name__ == '__main__':
     goal = int(input("What's your end goal for this habit (in min): "))
     schedule = generate_schedule(current_time_spent, goal, compound_percent)
     print('\n\n\n')
+   
+    print("CURRENT WEEK")
     for day in schedule:
         print_day(day)
         if(day[1][0:3] == 'Sun'):
             break
-    day_counter = 0
-    for day in schedule:
-        if day_counter % 7 == 0:
-            print(f'WEEK {int(day_counter/7)}')
+
+    for index, day in enumerate(schedule):
+        if index % 7 == 0:
+            print(f'WEEK {int(index/7) + 1}')
         print_day(day)
-        if day_counter % 7 == 6:
+        if index % 7 == 6:
             print()
-        day_counter += 1
